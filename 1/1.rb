@@ -23,15 +23,13 @@ def two_sum(array, target_val)
 end
 
 def three_sum(array, target_val)
-  output = []
-
   array.each.with_index do |x, i|
-    remaining_array = array[0..i-1] + array[i+1..-1]
+    remaining_array = array[i+1..-1]
     combination = [x] + two_sum(remaining_array, target_val - x)
     return combination if combination.sum == target_val && combination.length == 3
   end
 
-  output
+  []
 end
 
 puts "#{two_sum(inputs, 2020)}"
