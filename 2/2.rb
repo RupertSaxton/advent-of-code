@@ -17,9 +17,7 @@ end
 
 def part_2_rules(inputs)
   valid_inputs = inputs.select do |input|
-    first = input[:password][input[:lower] - 1] == input[:letter] && input[:password][input[:upper] - 1] != input[:letter]
-    second = input[:password][input[:upper] - 1] == input[:letter] && input[:password][input[:lower] - 1] != input[:letter]
-    first ^ second
+    (input[:password][input[:lower] - 1] == input[:letter]) ^ (input[:password][input[:upper] - 1] == input[:letter])
   end
 end
 
