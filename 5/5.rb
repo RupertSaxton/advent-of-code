@@ -3,11 +3,11 @@ def find_row(boarding_pass)
   boarding_pass[0..6].split('').each do |x|
     if x == 'F'
       range = (range.min..((range.max-range.min)/2)+range.min)
-    else
+    elsif x == 'B'
       range = (((range.max-range.min)/2)+range.min+1..range.max)
     end
   end
-  range.min
+  range.to_a.pop
 end
 
 def find_column(boarding_pass)
@@ -15,11 +15,11 @@ def find_column(boarding_pass)
   boarding_pass[7..9].split('').each do |x|
     if x == 'L'
       range = (range.min..((range.max-range.min)/2)+range.min)
-    else
+    elsif x == 'R'
       range = (((range.max-range.min)/2)+range.min+1..range.max)
     end
   end
-  range.min
+  range.to_a.pop
 end
 
 def find_seat_id(boarding_pass)
