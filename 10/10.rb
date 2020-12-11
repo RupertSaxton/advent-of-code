@@ -1,9 +1,8 @@
 require 'set'
 
-input = File.open('other.txt').readlines.map { |x| x.chomp.to_i }.sort
+input = File.open('input10.txt').readlines.map { |x| x.chomp.to_i }.sort
 
 input = [0] + input + [input[-1] + 3]
-puts "#{input}"
 
 def part1(input)
   ones = 0
@@ -20,51 +19,61 @@ def part1(input)
   ones * threes
 end
 
+class Tree
+  attr_accessor :nodes, :value
+
+  def initialize(value)
+    @value = value
+    @nodes = []
+  end
+end
+
+def build_tree(input)
+  value = input[0]
+  tree = Tree.new(value)
+  return tree if input.length == 1
+  if input.length < 4
+    intersection = (value+1..value+3).to_a & input[1..-1]
+  else
+    intersection = (value+1..value+3).to_a & input[1..3]
+  end
+  intersection.each.with_index do |x, i|
+    tree.nodes << build_tree(input[i+1..-1])
+  end
+  tree
+end
+
+def count_value_in_tree(tree, target_value, current_count)
+  return 1 if tree.value == target_value
+  tree.nodes.sum do |node|
+    count_value_in_tree(node, target_value, current_count)
+  end
+end
+
+def find_break_indexes(input)
+  values = input[0..-3].select.with_index do |x, i|
+    diff1 = input[i+1] - x
+    diff2 = input[i+2] - input[i+1]
+    if diff1 == 3 && diff2 == 3
+      true
+    else
+      false
+    end
+  end
+  values.map do |x|
+    input.index(x)
+  end
+end
+
 
 def part2(input)
-  counts = []
-  input.each.with_index do |x, i|
-    intersection = (x+1..x+3).to_a & input[i+1..i+3]
-    if intersection.length == 3
-      counts << intersection[1..-1]
-    end
-    counts << intersection
-    # puts "counts: #{counts}"s
+  breaks = [0] + find_break_indexes(input) + [input.length - 1]
+  counts = breaks[0..-2].map.with_index do |x, i|
+    tree = build_tree(input[x..breaks[i+1]])
+    count_value_in_tree(tree, input[breaks[i+1]], 0)
   end
-  counts.map! { |arr| [arr[-1]] }.flatten!
-  nodes = []
-  input.each do |x|
-    count = counts.count(x)
-    nodes << count
-  end
-  total_memo = 0
-  running_memo = 1
-  nodes[0..-3].each.with_index do |x, i|
-    if nodes[i+1..i+2] == [1, 1]
-      total_memo += running_memo
-      running_memo = 1
-    elsif x > 0
-      running_memo *= x
-    end
-  end
-
-  total_memo + running_memo
-  # counts.flatten!.sort
-  # counts.map { |x| (1..x).reduce(&:*) }.sum
+  counts.reduce(&:*)
 end
 
 puts part1(input)
-# x = part2(input)
-# require 'pry'; binding.pry
-# puts "#{input}"
 puts "#{part2(input)}"
-
-def wip(input)
-  jumps = input[1..-1].map.with_index do |x, i|
-    x - input[i]
-  end
-
-  indexes = jumps.each_index.select { |i| jumps[i] == 3}
-end
-
-# puts "#{wip(input)}"
